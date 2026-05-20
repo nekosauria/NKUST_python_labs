@@ -1,0 +1,46 @@
+<!-- templates/predict.html -->
+{% extends "base.html" %}
+
+{% block title %}預測結果{% endblock %}
+
+{% block content %}
+
+    <!-- 引入banner -->
+    {% include "banner.html" %}
+    <!-- 在 <body> 剛開始的地方加入 -->
+    <div style="text-align: left; margin-top: 20px;">
+        <img src="{{ url_for('static', filename='images/img.png') }}" alt="Logo" style="width: 150px; height: auto;">
+    </div>
+
+    <h1>Prediction Result</h1>
+    <p>x1 = {{ x1 }}</p>
+    <p>x2 = {{ x2 }}</p>
+    <p>predict y = {{ y }}</p>
+    <a href="/">back</a>
+
+
+    <!-- flask template 有權限控制 , 無法用 href 直接跳轉 -->
+    <!-- 在 <body> 中加入 -->
+    <div style="margin-top: 20px;">
+        <a href="static/product.html" target="_blank" style="text-decoration: none; color: #4285F4; display: inline-flex; align-items: center; border: 1px solid #ddd; padding: 10px 20px; border-radius: 5px;">
+            Search our Common Product in a href
+        </a>
+    </div>
+
+    <!-- 修改後的連結 -->
+    <div style="margin-top: 20px;">
+        <a href="{{ url_for('static', filename='product2.html') }}" target="_blank"
+           style="text-decoration: none; color: #4285F4; display: inline-flex; align-items: center; border: 1px solid #ddd; padding: 10px 20px; border-radius: 5px;">
+            Search our Super Product in url_for
+        </a>
+    </div>
+
+    <!-- 在 <body> 中加入 -->
+    <div style="margin-top: 20px;">
+        <a href="https://www.google.com" target="_blank" style="text-decoration: none; color: #4285F4; display: inline-flex; align-items: center; border: 1px solid #ddd; padding: 10px 20px; border-radius: 5px;">
+            Search on Google
+        </a>
+    </div>
+
+{% endblock %}
+

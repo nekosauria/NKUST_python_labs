@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>OpenCV Flask Demo</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 20px; }
+        .img-box { margin-bottom: 20px; border: 1px solid #ccc; padding: 10px; }
+        .input-group { margin: 10px 0; }
+        input { padding: 5px; width: 250px; }
+        button { padding: 5px 20px; cursor: pointer; background: #007bff; color: white; border: none; }
+    </style>
+</head>
+<body>
+    <h1>OpenCV 影像修改工具</h1>
+
+    <div class="img-box">
+        <!-- 3. Flask 渲染圖片 -->
+        <h3>當前預覽：</h3>
+        <img src="{{ url_for('static', filename=display_image) }}?t={{ range(1, 9999)|random }}" alt="Preview" style="max-width: 800px;">
+    </div>
+
+    <!-- 4. 輸入區塊與按鈕 -->
+    <form method="POST">
+        <div class="input-group">
+            <label>Range (Y:Y, X:X): </label>
+            <input type="text" name="range_input" placeholder="例如 1:300, 1:500" required>
+        </div>
+        <div class="input-group">
+            <label>Color (B, G, R): </label>
+            <input type="text" name="color_input" placeholder="例如 255, 155, 50" required>
+        </div>
+        <button type="submit">送出修改指令</button>
+    </form>
+
+    <p style="color: gray; font-size: 0.8em;">註：OpenCV 的顏色順序為 BGR (藍, 綠, 紅)</p>
+</body>
+</html>

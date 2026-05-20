@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI provide base html{% endblock %}</title>
+    <style>
+        /* 基礎樣式設定 */
+        :root {
+            --primary-color: #4285F4;
+            --secondary-color: #34a853;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* Banner (導覽列) 美化 */
+        nav {
+            background-color: #ffffff;
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .nav-logo img {
+            height: 35px;
+            margin-right: 10px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #666;
+            margin-left: 20px;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        /* 內容容器 */
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        /* 頁尾 */
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        /* 響應式微調 */
+        @media (max-width: 600px) {
+            nav { padding: 1rem; flex-direction: column; }
+            .nav-links { margin-top: 10px; }
+            .container { margin: 20px; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/" class="nav-logo">
+            <!-- 這裡放你的 Logo -->
+            <img src="https://cdn-icons-png.flaticon.com/512/2103/2103633.png" alt="Logo">
+            AI provide base html
+        </a>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="https://www.google.com" target="_blank">Google Search</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer>
+        &copy; 2026 AI Image Recognition Project
+    </footer>
+
+</body>
+</html>
