@@ -6,8 +6,8 @@ import plt
 
 # show test images
 # 讀取影像 show 灰階
-#in_img = cv2.imread("/Users/teddylai/nas_workplace_fetch/school_achievements/NKUST/workplace/NKUST_python_labs/digital_images/cat.png",0)
-in_img = cv2.imread("/Users/teddylai/nas_workplace_fetch/school_achievements/NKUST/workplace/NKUST_python_labs/digital_images/cat.png",0)
+#in_img = cv2.imread("/Users/teddylai/nas_workplace_fetch/git_resources/side_project/NKUST_python_labs/digital_images/cat.png",0)
+in_img = cv2.imread("/Users/teddylai/nas_workplace_fetch/git_resources/side_project/NKUST_python_labs/digital_images/cat.png",0)
 
 '''
 # cv2 套件實作
