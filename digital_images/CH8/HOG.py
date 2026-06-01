@@ -1,6 +1,8 @@
 import cv2
 import numpy
 import plt
+from utils.pypath import load_PP
+
 
 # HOG 特徵設定（拿來做數字辨識）
 
@@ -65,7 +67,7 @@ axes = axes.flatten()  # 把二維陣列攤平，方便用索引存取
 
 # loading images
 for idx in range(10):
-    file_name = f"/Users/teddylai/nas_workplace_fetch/git_resources/side_project/NKUST_python_labs/digital_images/HOGs/digit_{idx}.bmp"
+    file_name = f"{load_PP("digital_images/HOGs_SVM")}/digit_{idx}.bmp"
 
     # black & white （抓梯度效果較好）
     mat = cv2.imread(file_name,0)

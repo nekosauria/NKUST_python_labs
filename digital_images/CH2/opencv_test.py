@@ -1,11 +1,13 @@
 # add import
 import cv2
 import time
+from utils.pypath import load_PP
+
 
 # show test images
 # 若沒有轉檔,直接改檔名 , 編碼器會看 image content header 切換編碼 type
-#in_img = cv2.imread("/Users/teddylai/nas_workplace_fetch/git_resources/side_project/NKUST_python_labs/digital_images/cat.bmp")
-in_img = cv2.imread("/Users/teddylai/nas_workplace_fetch/git_resources/side_project/NKUST_python_labs/digital_images/cat.png")
+in_img = cv2.imread(load_PP("digital_images/cat.bmp"))
+# in_img = cv2.imread(load_PP("digital_images/cat.png"))
 cv2.imshow("Original Image", in_img)
 print("提示: 請按 enter 鍵關閉圖片視窗以繼續執行後續代碼...")
 cv2.waitKey(0) # 等待按鍵

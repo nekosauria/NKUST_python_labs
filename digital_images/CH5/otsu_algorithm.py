@@ -1,9 +1,10 @@
 import cv2
+from utils.pypath import load_PP
 
 ## 背景物體分離演算法
 
 # 讀取圖片 , 轉成黑白
-gray_image = cv2.imread("/Users/teddylai/nas_workplace_fetch/git_resources/side_project/NKUST_python_labs/digital_images/license_plate.bmp", 0)
+gray_image = cv2.imread(load_PP("digital_images/license_plate.bmp"), 0)
 cv2.imshow("license_plate.bmp",gray_image)
 cv2.waitKey(0) # 等待按鍵
 cv2.destroyAllWindows() # 關閉所有視窗

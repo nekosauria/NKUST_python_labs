@@ -17,10 +17,10 @@ desktop.ini              # Windows
 #*.csv
 
 # Byte-compiled / optimized / DLL files
-#__pycache__/
-#*.py[cod]
-#*.pyo
-#*.pyd
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
 # Virtual Environment
 #venv/
 #env/

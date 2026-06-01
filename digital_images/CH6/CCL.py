@@ -1,9 +1,11 @@
 import cv2
 import numpy as np
+from utils.pypath import load_PP
+
 
 ## 背景物體分離演算法
 # THRESH_BINARY_INV = 黑白反相
-gray_image = cv2.imread("/Users/teddylai/nas_workplace_fetch/git_resources/side_project/NKUST_python_labs/digital_images/license_plate.bmp", 0)
+gray_image = cv2.imread(load_PP("digital_images/license_plate.bmp"), 0)
 th, binary_image = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 # th, binary_image = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_TRIANGLE)
 # binary_image = cv2.adaptiveThreshold(

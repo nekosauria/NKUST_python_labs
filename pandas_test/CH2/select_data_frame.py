@@ -1,6 +1,7 @@
 import pandas as pd
+from utils.pypath import load_PP
 
-data_path = "/Users/teddylai/nas_workplace_fetch/git_resources/side_project/NKUST_python_labs/pandas_test/products.csv"
+data_path = load_PP("pandas_test/products.csv")
 
 df = pd.read_csv(data_path, encoding="utf8")
 

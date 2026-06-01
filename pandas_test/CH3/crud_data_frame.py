@@ -1,14 +1,16 @@
 import pandas as pd
 import random
+from utils.pypath import load_PP
+
 
 # 注意 update delete 都不會影響到真實資料
-data_path = "/Users/teddylai/nas_workplace_fetch/git_resources/side_project/NKUST_python_labs/pandas_test/products.csv"
+data_path = load_PP("pandas_test/products.csv")
 df = pd.read_csv(data_path, encoding="utf8")
 df.columns = ["id", "type", "name", "price"]
 ordinals = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"]
 df.index = ordinals
 
-# print(df.info())
+print(df.info())
 
 # update data (不改真實 data)
 # s = ["z", "居家", "家樂福", 30.4]
