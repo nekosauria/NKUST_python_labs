@@ -4,7 +4,7 @@ import numpy
 
 # 匯入自定義的工具函式與自製的 MNIST 讀取類別
 from utils.pypath import load_PP
-from HOGs_SVM import MNIST as mnist
+from digital_images.HOGs_SVM import MNIST as mnist
 
 # ==========================================
 # 1. 環境準備與模型/資料載入
