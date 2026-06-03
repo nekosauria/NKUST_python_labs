@@ -2,6 +2,8 @@
 
 本範例用線性回歸（Linear Regression）說明機器學習模型在訓練階段中，如何透過 **Mini-batch Gradient Descent** 與 **Epochs** 進行參數更新。
 
+先用 numpy 實作概念, 最後改成較常用的 pytorch impl
+
 ---
 
 ## 🧠 基本概念

@@ -75,6 +75,14 @@ for idx in range(n_test):
 # 計算最終預測的準確百分比
 accuracy = n_correct / n_test * 100
 
+
+
+# train 出來的 xml size = 11MB
+# 準確度約為: 92.61 %
+
+# 空間吃比較多是存 support vector (主因) + xml 沒有壓縮原因
+# SVM 是從你訓練的一萬筆資料中，挑出那些最難分、最靠近邊界的關鍵資料點，
+# 把這些「原始資料點」直接存下來，這群被挑出來的原始資料就叫做「支持向量（Support Vectors）」。
 print("---------------------------------")
 print(f"正確預測數 (n_correct) = {n_correct}")
 print(f"總測試張數 (n_test)    = {n_test}")

@@ -3,7 +3,7 @@ import os
 from utils.pypath import load_PP
 
 # import 函式庫 (看測試集物件)
-from HOGs_SVM import MNIST as mnist
+from digital_images.HOGs_SVM import MNIST as mnist
 
 
 # add 訓練集
