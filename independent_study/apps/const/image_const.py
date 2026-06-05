@@ -118,7 +118,7 @@ class ImageConst:
      'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier',
      'toothbrush']
 
-    SCORE_THRESHOLD= 0.7
+    SCORE_THRESHOLD= 0.5
 
 def allowed_file(filename: str) -> bool:
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ImageConst.ALLOWED_EXTENSIONS

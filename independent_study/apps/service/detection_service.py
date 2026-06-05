@@ -20,7 +20,7 @@ class DetectionService:
             self._model.load(self._model.model_path)
             self._loaded = True
 
-    def make_detect_image(self, file) -> tuple[list, dict, str, str]:
+    def make_detect_image(self, file) -> tuple[dict, str, str]:
         """
         接收前端上傳的檔案物件，儲存原始圖片後執行物件偵測，
         並將偵測結果（框線 + 標籤）繪製後存檔。
@@ -29,8 +29,6 @@ class DetectionService:
             file: 前端上傳的檔案物件（需支援 .read() 與 .filename）
 
         Returns:
-            tuple: (tags, tag_scores, detect_img)
-                - tags (list[str]): 本次偵測到的物件標籤清單（去重複）
                 - tag_scores (dict): 各標籤對應的信心分數
                 - ora_img (str): 原圖片的網址
                 - detect_img (str): 偵測結果圖片的網址
@@ -51,7 +49,7 @@ class DetectionService:
         print(f"labels: {labels}")
 
         image = Image.open(input_path)
-        tags = []  # 紀錄已標記過的標籤，避免重複
+        tags = []
         tag_scores = {}  # 紀錄每個標籤對應的信心分數
         result_image = np.array(image.copy())  # 複製原圖作為繪圖畫布（RGB numpy array）
 
@@ -84,7 +82,7 @@ class DetectionService:
                 result_image = draw_texts(result_image, line, c1, color, labels, label_idx)
 
                 # 記錄已處理的標籤與對應信心分數
-                tags.append(labels[label_idx])
+                tags.append(label_idx)
                 tag_scores[labels[label_idx]] = round(float(score), 4)
 
         # ✅ imwrite 前確認 result_image 是合法的 numpy array
@@ -97,6 +95,6 @@ class DetectionService:
 
         # return data
         detect_img = f"{ImageConst.WEB_BASE_URL}/{ImageConst.RESULT_FOLDER}/{output_path.name}"
-        print(tags, tag_scores, ora_img, detect_img)
+        print(tag_scores, ora_img, detect_img)
 
-        return tags, tag_scores, ora_img, detect_img
+        return tag_scores, ora_img, detect_img

@@ -44,7 +44,7 @@ def upload():
         svc = DetectionService(model=model)
 
         t0 = time.time()
-        tags, tag_scores, ora_img, detect_img = svc.make_detect_image(file)
+        tag_scores, ora_img, detect_img = svc.make_detect_image(file)
         cost = round(time.time() - t0, 3)
         print(f"\n[{model.__class__.__name__}] make_detect_image cost: {cost}s")
 
@@ -54,8 +54,7 @@ def upload():
     data = {
         "model": model_type,
         "cost_sec": cost,
-        "tags": tags,
-        "scores": tag_scores,
+        "tag_scores": tag_scores,
         "ora_img": ora_img,
         "detect_img": detect_img
     }

@@ -136,13 +136,21 @@
 
     .result-section { display: none; margin-top: 24px; }
 
-    .curl-block { margin-top: 28px; width: 100%; max-width: 520px; }
-    .curl-block summary { color: var(--muted); font-size: 0.78rem; cursor: pointer; user-select: none; margin-bottom: 8px; }
+    /* ── info blocks ── */
+    .info-container { width: 100%; max-width: 520px; margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+    .info-block { width: 100%; }
+    .info-block summary { color: var(--muted); font-size: 0.78rem; cursor: pointer; user-select: none; margin-bottom: 6px; outline: none; }
+    .info-block summary:hover { color: var(--text); }
+    
     pre {
       background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
       padding: 16px; font-size: 0.72rem; color: #aaa;
-      overflow-x: auto; white-space: pre-wrap; word-break: break-all;
+      overflow-x: auto; white-space: pre; word-break: normal;
+      font-family: 'Courier New', Courier, monospace;
     }
+    .json-key { color: #e8ff47; }
+    .json-str { color: #a2e57b; }
+    .json-num { color: #ff9d5c; }
   </style>
 </head>
 <body>
@@ -200,95 +208,114 @@
     </div>
   </div>
 
-  <details class="curl-block">
-    <summary>▸ cURL 範例指令</summary>
-    <pre>curl -X POST http://localhost:5001/upload \
+  <div class="info-container">
+    <details class="info-block">
+      <summary>▸ cURL 範例指令</summary>
+      <pre>curl -X POST http://localhost:5001/upload \
   -F "image=@/path/to/your/image.jpg" \
   -F "model=yolo"</pre>
-  </details>
+    </details>
+
+    <details class="info-block">
+      <summary>▸ Response JSON 範例</summary>
+      <pre>{
+  <span class="json-key">"model"</span>: <span class="json-str">"torch"</span>,
+  <span class="json-key">"cost_sec"</span>: <span class="json-num">0.74</span>,
+  <span class="json-key">"tag_scores"</span>: {
+    <span class="json-key">"cat"</span>: <span class="json-num">0.9957</span>
+  },
+  <span class="json-key">"ora_img"</span>: <span class="json-str">"http://127.0.0.1:5566/static/uploads/..._cat2.jpeg"</span>,
+  <span class="json-key">"detect_img"</span>: <span class="json-str">"http://127.0.0.1:5566/static/results/..._cat2.jpeg"</span>
+}</pre>
+    </details>
+  </div>
 
   <script>
-    const fileInput     = document.getElementById('fileInput');
-    const uploadBtn     = document.getElementById('uploadBtn');
-    const fnameEl       = document.getElementById('fname');
-    const statusEl      = document.getElementById('status');
-    const dropZone      = document.getElementById('dropZone');
-    const modelSelect   = document.getElementById('modelSelect');
-    const resultSection = document.getElementById('resultSection');
-    const tagsRow       = document.getElementById('tagsRow');
-    const oraImg        = document.getElementById('oraImg');
-    const detectImg     = document.getElementById('detectImg');
-    const metaModel     = document.getElementById('metaModel');
-    const metaCost      = document.getElementById('metaCost');
+  const fileInput     = document.getElementById('fileInput');
+  const uploadBtn     = document.getElementById('uploadBtn');
+  const fnameEl       = document.getElementById('fname');
+  const statusEl      = document.getElementById('status');
+  const dropZone      = document.getElementById('dropZone');
+  const modelSelect   = document.getElementById('modelSelect');
+  const resultSection = document.getElementById('resultSection');
+  const tagsRow       = document.getElementById('tagsRow');
+  const oraImg        = document.getElementById('oraImg');
+  const detectImg     = document.getElementById('detectImg');
+  const metaModel     = document.getElementById('metaModel');
+  const metaCost      = document.getElementById('metaCost');
 
-    fileInput.addEventListener('change', () => {
-      if (fileInput.files[0]) {
-        fnameEl.textContent = fileInput.files[0].name;
-        uploadBtn.disabled = false;
-      }
-    });
-
-    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-    dropZone.addEventListener('drop', e => {
-      e.preventDefault();
-      dropZone.classList.remove('dragover');
-      fileInput.files = e.dataTransfer.files;
-      fileInput.dispatchEvent(new Event('change'));
-    });
-
-    async function upload() {
-      const file = fileInput.files[0];
-      if (!file) return;
-
-      statusEl.textContent = '上傳中…';
-      uploadBtn.disabled = true;
-      resultSection.style.display = 'none';
-      tagsRow.innerHTML = '';
-
-      const form = new FormData();
-      form.append('image', file);
-      form.append('model', modelSelect.value);
-
-      try {
-        const res = await fetch('/upload', { method: 'POST', body: form });
-        if (!res.ok) throw new Error(await res.text());
-        const data = await res.json();
-
-        // meta
-        metaModel.textContent = data.model ?? '—';
-        metaCost.textContent  = data.cost_sec != null ? `${data.cost_sec}s` : '—';
-
-        // 圖片
-        oraImg.src    = data.ora_img;
-        detectImg.src = data.detect_img;
-
-        // 標籤 + 信心分數
-        (data.tags || []).forEach(tag => {
-          const score = data.scores?.[tag];
-          const pct   = score != null ? (score * 100).toFixed(2) : null;
-          const el    = document.createElement('div');
-          el.className = 'tag';
-          el.innerHTML = `
-            <span class="label">${tag}</span>
-            ${pct != null ? `
-              <div class="score-bar-bg">
-                <div class="score-bar" style="width:${pct}%"></div>
-              </div>
-              <span class="score-val">${pct}%</span>
-            ` : ''}
-          `;
-          tagsRow.appendChild(el);
-        });
-
-        resultSection.style.display = 'block';
-        statusEl.textContent = '✓ 完成';
-      } catch (e) {
-        statusEl.textContent = '❌ 錯誤：' + e.message;
-      } finally {
-        uploadBtn.disabled = false;
-      }
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) {
+      fnameEl.textContent = fileInput.files[0].name;
+      uploadBtn.disabled = false;
     }
+  });
+
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    fileInput.files = e.dataTransfer.files;
+    fileInput.dispatchEvent(new Event('change'));
+  });
+
+  async function upload() {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    statusEl.textContent = '上傳中…';
+    uploadBtn.disabled = true;
+    resultSection.style.display = 'none';
+    tagsRow.innerHTML = ''; 
+
+    const form = new FormData();
+    form.append('image', file);
+    form.append('model', modelSelect.value);
+
+    try {
+      const res = await fetch('/upload', { method: 'POST', body: form });
+      if (!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+
+      // 1. 推論資訊綁定
+      metaModel.textContent = data.model ?? '—';
+      metaCost.textContent  = data.cost_sec != null ? `${data.cost_sec}s` : '—';
+
+      // 2. 圖片路徑更新
+      oraImg.src    = data.ora_img;
+      detectImg.src = data.detect_img;
+
+      // 3. 解析 tag_scores 字典的核心邏輯
+      const scoresObj = data.tag_scores || {};
+      const tagsList = Object.keys(scoresObj);
+
+      tagsList.forEach((tag) => {
+        const score = scoresObj[tag];
+        const pct   = score != null ? (score * 100).toFixed(2) : null;
+
+        const el = document.createElement('div');
+        el.className = 'tag';
+        el.innerHTML = `
+          <span class="label">${tag}</span>
+          ${pct != null ? `
+            <div class="score-bar-bg">
+              <div class="score-bar" style="width:${pct}%"></div>
+            </div>
+            <span class="score-val">${pct}%</span>
+          ` : ''}
+        `;
+        tagsRow.appendChild(el);
+      });
+
+      resultSection.style.display = 'block';
+      statusEl.textContent = '✓ 完成';
+    } catch (e) {
+      statusEl.textContent = '❌ 錯誤：' + e.message;
+    } finally {
+      uploadBtn.disabled = false;
+    }
+  }
   </script>
 </body>
 </html>
