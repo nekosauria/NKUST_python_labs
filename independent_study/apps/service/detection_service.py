@@ -2,12 +2,11 @@ import hashlib
 
 import cv2
 import numpy as np
-import torchvision
 from PIL import Image
 
 from apps.const.image_const import ImageConst
 from apps.model.interface.base_detection_model import BaseDetectionModel
-from apps.util.image_draw import make_color, make_line, draw_lines, draw_texts
+from apps.util.image_draw import get_color_by_label, make_line, draw_lines, draw_texts
 
 
 class DetectionService:
@@ -64,12 +63,12 @@ class DetectionService:
 
         # 開始畫框線
         # 【條件】信心分數需超過預測值就標記，且同一標籤不重複標記
-        for box, label, score in zip(output.boxes, output.labels, output.scores):
-            if score > ImageConst.SCORE_THRESHOLD and labels[label] not in tags:
-                print(f"score: {score:.4f}, label: {labels[label]}")
+        for box, label_idx, score in zip(output.boxes, output.labels, output.scores):
+            if score > ImageConst.SCORE_THRESHOLD and labels[label_idx] not in tags:
+                print(f"score: {score:.4f}, label: {labels[label_idx]}")
 
                 # 產生框線顏色（BGR or RGB tuple）
-                color = make_color(labels)
+                color = get_color_by_label(label_idx)
 
                 # 計算適合圖片尺寸的框線粗細
                 line = make_line(result_image)
@@ -82,11 +81,11 @@ class DetectionService:
                 result_image = draw_lines(c1, c2, result_image, line, color)
 
                 # 在偵測框旁繪製文字標籤
-                result_image = draw_texts(result_image, line, c1, color, labels, label)
+                result_image = draw_texts(result_image, line, c1, color, labels, label_idx)
 
                 # 記錄已處理的標籤與對應信心分數
-                tags.append(labels[label])
-                tag_scores[labels[label]] = round(float(score), 4)
+                tags.append(labels[label_idx])
+                tag_scores[labels[label_idx]] = round(float(score), 4)
 
         # ✅ imwrite 前確認 result_image 是合法的 numpy array
         if result_image is None or not isinstance(result_image, np.ndarray) or result_image.size == 0:
