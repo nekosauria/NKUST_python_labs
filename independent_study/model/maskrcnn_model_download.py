@@ -6,7 +6,7 @@ from torchvision.models.detection import MaskRCNN_ResNet50_FPN_Weights
 # https://docs.pytorch.org/vision/stable/models/generated/torchvision.models.detection.maskrcnn_resnet50_fpn.html
 # 下載 model
 model = torchvision.models.detection.maskrcnn_resnet50_fpn(pretrained=True)
-torch.save(model,load_PP('independent_study/model/model.pt'))
+torch.save(model,load_PP('independent_study/model/maskrcnn_model.pt'))
 
 # get 對應 labels
 weights = MaskRCNN_ResNet50_FPN_Weights.DEFAULT
