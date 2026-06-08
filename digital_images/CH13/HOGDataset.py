@@ -46,7 +46,7 @@ class DatasetImpl(Dataset):
         return hog, label
 
 
-class ModelImpl(torch.nn.Module):
+class NNModelImpl(torch.nn.Module):
 
     # 兩層 train 出來的 .pth size = 8KB
     # 準確度約為: 90.36%
@@ -80,7 +80,7 @@ class ModelImpl(torch.nn.Module):
     # 注意訓練,測試,跑真實案例 時間都會相應拉長！
 
     def __init__(self):
-        super(ModelImpl, self).__init__()
+        super(NNModelImpl, self).__init__()
 
         # === 隱藏層 1 ===
         # 輸入 36 維 (HOG 特徵)，我們把它放大到 64 維，讓模型有更多空間寬度去拆解特徵
@@ -106,4 +106,48 @@ class ModelImpl(torch.nn.Module):
 
         # 最後一層輸出層「不需要」加 ReLU，直接送出原始預測值 (Logits)
         y = self.fc_4(x)
+        return y
+
+
+
+class LeNetImpl(torch.nn.Module):
+
+    def __init__(self):
+        super(LeNetImpl, self).__init__()
+
+        # 卷積 + pooling 激活函數
+        # padding = 對齊格式至規定 (e.g. 灰階影像 28*28*1 -> 32*32*1 = +0 黑邊)
+        self.conv_1 = torch.nn.Conv2d(
+            in_channels=1, out_channels=6,
+            kernel_size=5, stride=1, padding=2, bias=True)
+
+        self.maxpool_1 = torch.nn.MaxPool2d(kernel_size=2)
+
+        self.conv_2 = torch.nn.Conv2d(
+            in_channels=6, out_channels=16,
+            kernel_size=5, stride=1, padding=0, bias=True)
+
+        self.maxpool_2 = torch.nn.MaxPool2d(kernel_size=2)
+
+        # Fully Connected Layer
+        # 這組數字完全是當年 Yann LeCun 在 1998 年發表 LeNet-5 論文時，原封不動的官方實作數字！
+        # 唯一的小差別只有當年的第一層輸入是 32，而現代因為 MNIST 數據集開源後被標準化成 28，
+        # 大家用 PyTorch 重寫時，通常會在第一層加上 padding=2 把它墊回 32，
+        # 好讓後面的 120 -> 84 -> 10 可以完美對齊論文。
+        self.fc1 = torch.nn.Linear(in_features=5 * 5 * 16, out_features=120, bias=True)
+        self.fc2 = torch.nn.Linear(in_features=120, out_features=84, bias=True)
+        self.fc3 = torch.nn.Linear(in_features=84, out_features=10, bias=True)
+
+    def  forward(self,  x):
+        # 訓練 LeNet
+        x  =  torch.nn.functional.relu(self.conv_1(x))
+        x  =  self.maxpool_1(x)
+        x  =  torch.nn.functional.relu(self.conv_2(x))
+        x  =  self.maxpool_2(x)
+
+        # flatten 攤平參數
+        x = x.view(-1, 5*5*16)
+        x = torch.nn.functional.relu(self.fc1(x))
+        x = torch.nn.functional.relu(self.fc2(x))
+        y = self.fc3(x)
         return y

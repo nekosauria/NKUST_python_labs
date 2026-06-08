@@ -7,7 +7,7 @@
 
 ## 📌 專案核心內容
 
-這個儲存庫主要由以下三個部分構成：
+這個儲存庫主要由以下部分構成：
 
 ### 🧬 1. Python 課堂實作（Base, Advanced Packages, OOP, Flask, Digital Images process）
 

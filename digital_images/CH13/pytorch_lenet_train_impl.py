@@ -1,8 +1,8 @@
 import torch
-from fontTools.varLib.avar import __main__
 from torch.utils.data import SubsetRandomSampler, DataLoader
 import plt
-from digital_images.CH13.HOGDataset import DatasetImpl, NNModelImpl
+from digital_images.CH13.HOGDataset import LeNetImpl
+import digital_images.HOGs_SVM.MNIST as mnist
 from utils.pypath import load_PP
 import os
 
@@ -15,20 +15,21 @@ batch_size = 20
 eta = 0.01
 
 # init train data & answer
-minist_train = DatasetImpl("train-images.idx3-ubyte", "train-labels.idx1-ubyte")
+# 直接取純圖像不經過 DatasetImpl
+minist_train = mnist.MNIST("train-images.idx3-ubyte", "train-labels.idx1-ubyte")
 
 # create a pytorch loader
 index_list = list(range(len(minist_train)))
 sampler = SubsetRandomSampler(index_list)
 loader = DataLoader(dataset=minist_train, sampler=sampler, batch_size=batch_size)
 
-# add nn model
-nn_model = NNModelImpl()
+# add LeNetImpl model
+le_model = LeNetImpl()
 
 # add optimizer
 # Stochastic Gradient Descent, 隨機梯度下降（或隨機梯度優化器）
 # lr = learning rate
-optimizer = torch.optim.SGD(nn_model.parameters(), lr=eta)
+optimizer = torch.optim.SGD(le_model.parameters(), lr=eta)
 
 # add loss function
 # CrossEntropyLoss = Softmax 函數 + Cross Entropy (交叉熵) 計算
@@ -44,8 +45,10 @@ else:
 
 print(f"使用裝置: {device}")
 
+
 # 正確搬移模型到裝置
-nn_model = nn_model.to(device)
+le_model = le_model.to(device)
+
 
 if __name__ == '__main__':
     loss_list = []
@@ -55,12 +58,12 @@ if __name__ == '__main__':
         total_loss = 0
         n_batch = 0
 
-        for hogs, target_labels in loader:
+        for images, target_labels in loader:
             # put data to gpu
-            hogs = hogs.to(device)
+            images = images.to(device)
 
             # 預測結果 (裡面會自己去 call 自己實作好的 forward function )
-            predictions = nn_model(hogs)
+            predictions = le_model(images)
 
             # 真實結果
             target_labels = target_labels.to(device)
@@ -86,12 +89,12 @@ if __name__ == '__main__':
         loss_list.append(average_loss)
         print(f"▶ Epoch [{epoch+1:02d}/{n_epoch}] - Loss: {average_loss:.4f}")
 
-    # 下載成 model, .pth
-    torch.save(nn_model.state_dict(), "nn.pth")
 
-    print(f"成功將模型儲存至：{os.path.join(os.getcwd(), 'nn.pth')}")
+    # 下載成 model, .pth
+    torch.save(le_model.state_dict(), "le.pth")
+
+    print(f"成功將模型儲存至：{os.path.join(os.getcwd(), 'le.pth')}")
     print(f"{loss_list}")
 
     plt.plot(range(len(loss_list)), loss_list)
     plt.show()
-
