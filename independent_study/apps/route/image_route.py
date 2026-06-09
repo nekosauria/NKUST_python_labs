@@ -44,7 +44,7 @@ def upload():
         svc = DetectionService(model=model)
 
         t0 = time.time()
-        tag_scores, ora_img, detect_img = svc.make_detect_image(file)
+        tag_scores, ora_img, detect_img = svc.make_detect_image(file, model_type)
         cost = round(time.time() - t0, 3)
         print(f"\n[{model.__class__.__name__}] make_detect_image cost: {cost}s")
 
@@ -62,9 +62,13 @@ def upload():
     # 建立 jsonify Response（給前端使用）
     result = jsonify(data)
 
+    # === 加上 No-Cache Headers，防止 Nginx、瀏覽器或 Cloudflare 快取 AI 辨識後的圖片結果 ===
+    result.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0'
+    result.headers['Pragma'] = 'no-cache'
+    result.headers['Expires'] = '0'
+
     # === 印出漂亮的 JSON 字串（方便 debug）===
     print("=== API Response JSON ===")
     print(json.dumps(data, ensure_ascii=False, indent=4))
 
     return result, 200
-

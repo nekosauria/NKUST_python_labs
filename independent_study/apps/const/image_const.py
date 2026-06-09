@@ -9,7 +9,7 @@ class ImageConst:
 
     WEB_BASE_HOST = "0.0.0.0"
     WEB_BASE_PORT = 5566
-    WEB_BASE_URL = "http://10.0.0.12:5566"
+    WEB_BASE_URL = "http://127.0.0.1:5566"
 
     # 用於物件偵測的標籤
     TORCH_LABELS = [

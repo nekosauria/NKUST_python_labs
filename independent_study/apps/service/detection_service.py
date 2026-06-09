@@ -20,13 +20,14 @@ class DetectionService:
             self._model.load(self._model.model_path)
             self._loaded = True
 
-    def make_detect_image(self, file) -> tuple[dict, str, str]:
+    def make_detect_image(self, file, model_type) -> tuple[dict, str, str]:
         """
         接收前端上傳的檔案物件，儲存原始圖片後執行物件偵測，
         並將偵測結果（框線 + 標籤）繪製後存檔。
 
         Args:
             file: 前端上傳的檔案物件（需支援 .read() 與 .filename）
+            model_type: 前端選擇的模型類型
 
         Returns:
                 - tag_scores (dict): 各標籤對應的信心分數
@@ -37,8 +38,8 @@ class DetectionService:
         # add md5 key
         data = file.read()
         md5 = hashlib.md5(data).hexdigest()
-        input_path  = ImageConst.UPLOAD_FOLDER / f"{md5}_{file.filename}"
-        output_path = ImageConst.RESULT_FOLDER / f"{md5}_{file.filename}"
+        input_path  = ImageConst.UPLOAD_FOLDER / f"{md5}_{model_type}_{file.filename}"
+        output_path = ImageConst.RESULT_FOLDER / f"{md5}_{model_type}_{file.filename}"
 
         # 寫入原圖
         input_path.write_bytes(data)
