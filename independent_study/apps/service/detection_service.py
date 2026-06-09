@@ -38,7 +38,7 @@ class DetectionService:
         # add md5 key
         data = file.read()
         md5 = hashlib.md5(data).hexdigest()
-        input_path  = ImageConst.UPLOAD_FOLDER / f"{md5}_{model_type}_{file.filename}"
+        input_path  = ImageConst.UPLOAD_FOLDER / f"{md5}_{file.filename}"
         output_path = ImageConst.RESULT_FOLDER / f"{md5}_{model_type}_{file.filename}"
 
         # 寫入原圖
