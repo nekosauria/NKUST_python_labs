@@ -18,7 +18,7 @@ pip install --upgrade pip
 pip install -r build/requirements.txt
 
 # add systemd service
-sudo vi /etc/systemd/system/independent_study.service
+sudo vi /etc/systemd/system/nkust_independent_study.service
 
 ```
 [Unit]
@@ -51,6 +51,6 @@ WantedBy=multi-user.target
 
 # enable systemd
 sudo systemctl daemon-reload
-sudo systemctl start independent_study
-sudo systemctl enable independent_study
-sudo systemctl status independent_study
+sudo systemctl start nkust_independent_study
+sudo systemctl enable nkust_independent_study
+sudo systemctl status nkust_independent_study
