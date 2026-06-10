@@ -12,6 +12,9 @@ from apps.service.detection_service import DetectionService
 image_bp = Blueprint("image", __name__)
 @image_bp.route('/upload', methods=["GET", "POST"])
 def upload():
+    # 紀錄 Cost time
+    t0 = time.time()
+
     if "image" not in request.files:
         return jsonify({"error": "no image field in form-data"}), 400
 
@@ -43,9 +46,8 @@ def upload():
 
         svc = DetectionService(model=model)
 
-        t0 = time.time()
-        tag_scores, ora_img, detect_img = svc.make_detect_image(file, model_type)
-        cost = round(time.time() - t0, 3)
+        tag_results, predict_list, ora_img, detect_img = svc.make_detect_image(file, model_type)
+        cost = round(time.time() - t0, 3) # e.g. yolo:0.35, torch:1.338
         print(f"\n[{model.__class__.__name__}] make_detect_image cost: {cost}s")
 
     except Exception as e:
@@ -54,7 +56,8 @@ def upload():
     data = {
         "model": model_type,
         "cost_sec": cost,
-        "tag_scores": tag_scores,
+        "tag_results": tag_results,
+        "predict_list": predict_list,
         "ora_img": ora_img,
         "detect_img": detect_img
     }

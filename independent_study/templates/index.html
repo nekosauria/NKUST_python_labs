@@ -121,6 +121,7 @@
     }
     .tag .score-bar { height: 100%; background: var(--accent); border-radius: 2px; }
     .tag .score-val { font-size: 12px; color: var(--muted); min-width: 34px; text-align: right; }
+    .tag.dim { opacity: 0.4; }
 
     .img-grid { display: flex; flex-direction: column; gap: 12px; }
     .img-card {
@@ -141,7 +142,7 @@
     .info-block { width: 100%; }
     .info-block summary { color: var(--muted); font-size: 0.78rem; cursor: pointer; user-select: none; margin-bottom: 6px; outline: none; }
     .info-block summary:hover { color: var(--text); }
-    
+
     pre {
       background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
       padding: 16px; font-size: 0.72rem; color: #aaa;
@@ -191,8 +192,11 @@
         </div>
       </div>
 
-      <p class="section-title">偵測標籤</p>
+      <p class="section-title">偵測結果</p>
       <div class="tags-row" id="tagsRow"></div>
+
+      <p class="section-title">所有預測</p>
+      <div class="tags-row" id="predictRow"></div>
 
       <p class="section-title">圖片比對</p>
       <div class="img-grid">
@@ -221,8 +225,13 @@
       <pre>{
   <span class="json-key">"model"</span>: <span class="json-str">"torch"</span>,
   <span class="json-key">"cost_sec"</span>: <span class="json-num">0.74</span>,
-  <span class="json-key">"tag_scores"</span>: {
+  <span class="json-key">"tag_results"</span>: {
     <span class="json-key">"cat"</span>: <span class="json-num">0.9957</span>
+  },
+  <span class="json-key">"predict_list"</span>: {
+    <span class="json-key">"cat"</span>: <span class="json-num">0.9957</span>,
+    <span class="json-key">"dog"</span>: <span class="json-num">0.1032</span>,
+    <span class="json-key">"person"</span>: <span class="json-num">null</span>
   },
   <span class="json-key">"ora_img"</span>: <span class="json-str">"http://127.0.0.1:5566/static/uploads/..._cat2.jpeg"</span>,
   <span class="json-key">"detect_img"</span>: <span class="json-str">"http://127.0.0.1:5566/static/results/..._cat2.jpeg"</span>
@@ -239,6 +248,7 @@
   const modelSelect   = document.getElementById('modelSelect');
   const resultSection = document.getElementById('resultSection');
   const tagsRow       = document.getElementById('tagsRow');
+  const predictRow    = document.getElementById('predictRow');
   const oraImg        = document.getElementById('oraImg');
   const detectImg     = document.getElementById('detectImg');
   const metaModel     = document.getElementById('metaModel');
@@ -267,7 +277,8 @@
     statusEl.textContent = '上傳中…';
     uploadBtn.disabled = true;
     resultSection.style.display = 'none';
-    tagsRow.innerHTML = ''; 
+    tagsRow.innerHTML = '';
+    predictRow.innerHTML = '';
 
     const form = new FormData();
     form.append('image', file);
@@ -286,11 +297,9 @@
       oraImg.src    = data.ora_img;
       detectImg.src = data.detect_img;
 
-      // 3. 解析 tag_scores 字典的核心邏輯
-      const scoresObj = data.tag_scores || {};
-      const tagsList = Object.keys(scoresObj);
-
-      tagsList.forEach((tag) => {
+      // 3. 解析 tag_results 字典的核心邏輯
+      const scoresObj = data.tag_results || {};
+      Object.keys(scoresObj).forEach((tag) => {
         const score = scoresObj[tag];
         const pct   = score != null ? (score * 100).toFixed(2) : null;
 
@@ -306,6 +315,25 @@
           ` : ''}
         `;
         tagsRow.appendChild(el);
+      });
+
+      // 4. 解析 predict_list（所有 label，含 null）
+      const predictObj = data.predict_list || {};
+      Object.entries(predictObj).forEach(([tag, score]) => {
+        const pct = score != null ? (score * 100).toFixed(2) : null;
+
+        const el = document.createElement('div');
+        el.className = 'tag' + (score == null ? ' dim' : '');
+        el.innerHTML = `
+          <span class="label">${tag}</span>
+          ${pct != null ? `
+            <div class="score-bar-bg">
+              <div class="score-bar" style="width:${pct}%"></div>
+            </div>
+            <span class="score-val">${pct}%</span>
+          ` : '<span class="score-val">—</span>'}
+        `;
+        predictRow.appendChild(el);
       });
 
       resultSection.style.display = 'block';

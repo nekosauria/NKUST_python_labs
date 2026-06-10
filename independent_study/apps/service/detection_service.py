@@ -20,7 +20,7 @@ class DetectionService:
             self._model.load(self._model.model_path)
             self._loaded = True
 
-    def make_detect_image(self, file, model_type) -> tuple[dict, str, str]:
+    def make_detect_image(self, file, model_type) -> tuple[dict, dict, str, str]:
         """
         接收前端上傳的檔案物件，儲存原始圖片後執行物件偵測，
         並將偵測結果（框線 + 標籤）繪製後存檔。
@@ -30,7 +30,7 @@ class DetectionService:
             model_type: 前端選擇的模型類型
 
         Returns:
-                - tag_scores (dict): 各標籤對應的信心分數
+                - tag_results (dict): 各標籤對應的信心分數
                 - ora_img (str): 原圖片的網址
                 - detect_img (str): 偵測結果圖片的網址
         """
@@ -51,7 +51,8 @@ class DetectionService:
 
         image = Image.open(input_path)
         tags = []
-        tag_scores = {}  # 紀錄每個標籤對應的信心分數
+        tag_results = {}  # 紀錄每個標籤對應的信心分數
+        predict_list = {}  # 所有預測結果，給前端參考
         result_image = np.array(image.copy())  # 複製原圖作為繪圖畫布（RGB numpy array）
 
         # -----------------------------------------------------------
@@ -61,8 +62,14 @@ class DetectionService:
         # -----------------------------------------------------------
 
         # 開始畫框線
-        # 【條件】信心分數需超過預測值就標記，且同一標籤不重複標記
         for box, label_idx, score in zip(output.boxes, output.labels, output.scores):
+            label_name = labels[label_idx]
+
+            # 不論分數，全部收入 predict_list（同標籤保留最高分）
+            if label_name not in predict_list or score > predict_list[label_name]:
+                predict_list[label_name] = round(float(score), 4)
+
+            # 【條件】信心分數需超過預測值就標記，且同一標籤不重複標記
             if score > ImageConst.SCORE_THRESHOLD and labels[label_idx] not in tags:
                 print(f"score: {score:.4f}, label: {labels[label_idx]}")
 
@@ -84,7 +91,7 @@ class DetectionService:
 
                 # 記錄已處理的標籤與對應信心分數
                 tags.append(label_idx)
-                tag_scores[labels[label_idx]] = round(float(score), 4)
+                tag_results[labels[label_idx]] = round(float(score), 4)
 
         # ✅ imwrite 前確認 result_image 是合法的 numpy array
         if result_image is None or not isinstance(result_image, np.ndarray) or result_image.size == 0:
@@ -96,6 +103,6 @@ class DetectionService:
 
         # return data
         detect_img = f"{ImageConst.WEB_BASE_URL}/{ImageConst.RESULT_FOLDER}/{output_path.name}"
-        print(tag_scores, ora_img, detect_img)
+        print(tag_results, predict_list, ora_img, detect_img)
 
-        return tag_scores, ora_img, detect_img
+        return tag_results, predict_list, ora_img, detect_img

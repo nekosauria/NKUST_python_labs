@@ -40,7 +40,6 @@ class YoloDetectionModel(BaseDetectionModel):
             raise RuntimeError("模型尚未載入，請先呼叫 load()")
 
         output = self._model(image, verbose=False)[0]
-
         boxes, labels, scores = [], [], []
         seen = set()
 
@@ -52,7 +51,7 @@ class YoloDetectionModel(BaseDetectionModel):
                 continue
 
             score = round(float(box.conf[0]), 4)
-            if score > self._score_threshold and label_str not in seen:
+            if label_str not in seen:
                 seen.add(label_str)
                 x1, y1, x2, y2 = box.xyxy[0].tolist()
                 boxes.append((int(x1), int(y1), int(x2), int(y2)))

@@ -92,14 +92,13 @@ class TorchDetectionModel(BaseDetectionModel):
         """
 
         output = self._model([image_tensor])[0]
-
         boxes, labels, scores = [], [], []
         seen = set()
 
         for box, label, score in zip(output["boxes"], output["labels"], output["scores"]):
-            tag = self._labels[label]
-            if score > self._score_threshold and tag not in seen:
-                seen.add(tag)
+            label_str = self._labels[int(label)]
+            if label_str not in seen:
+                seen.add(label_str)
                 boxes.append((int(box[0]), int(box[1]), int(box[2]), int(box[3])))
                 labels.append(int(label))
                 scores.append(round(float(score), 4))
