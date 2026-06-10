@@ -11,6 +11,10 @@ class ImageConst:
     WEB_BASE_PORT = 5566
     WEB_BASE_URL = "http://127.0.0.1:5566"
 
+    # 💡 新增模型名稱常數
+    MODEL_TORCH = "torch"
+    MODEL_YOLO = "yolo"
+
     # 用於物件偵測的標籤
     TORCH_LABELS = [
         "unlabeled",

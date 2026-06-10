@@ -93,14 +93,18 @@ class TorchDetectionModel(BaseDetectionModel):
 
         output = self._model([image_tensor])[0]
         boxes, labels, scores = [], [], []
-        seen = set()
+        # 每個 label 若有重複取分數最高
+        best = {}  # label_str -> (box, label_idx, score)
 
         for box, label, score in zip(output["boxes"], output["labels"], output["scores"]):
             label_str = self._labels[int(label)]
-            if label_str not in seen:
-                seen.add(label_str)
-                boxes.append((int(box[0]), int(box[1]), int(box[2]), int(box[3])))
-                labels.append(int(label))
-                scores.append(round(float(score), 4))
+            score_f = round(float(score), 4)
+            if label_str not in best or score_f > best[label_str][2]:
+                best[label_str] = (box, int(label), score_f)
+
+        for box, label_idx, score in best.values():
+            boxes.append((int(box[0]), int(box[1]), int(box[2]), int(box[3])))
+            labels.append(label_idx)
+            scores.append(score)
 
         return DetectionResult(boxes=boxes, labels=labels, scores=scores)

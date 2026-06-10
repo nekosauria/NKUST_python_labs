@@ -9,7 +9,7 @@
 #   -F "image=@<your_img_path>" \
 #                                           # [表單欄位 1] 模擬網頁上傳檔案 (multipart/form-data)
 #                                           # Key 名稱為 "image"，"@" 後面接 Mac 當地實體圖片路徑
-#   -F "model=<model_name>"                         # [表單欄位 2] 傳送額外文字參數，指定後端使用 "yolo" 或 "torch" 模型進行辨識
+#   -F "model=<model_name>"                 # [表單欄位 2] 傳送額外文字參數，指定後端使用 "yolo" 或 "torch" 模型進行辨識
 #
 # ⚠️ 注意事項：
 #   末尾的反斜線 `\` 代表「指令換行連接符」，能讓多行指令在終端機被視為同一筆執行。

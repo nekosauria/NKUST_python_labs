@@ -41,7 +41,8 @@ class YoloDetectionModel(BaseDetectionModel):
 
         output = self._model(image, verbose=False)[0]
         boxes, labels, scores = [], [], []
-        seen = set()
+        # 每個 label 若有重複取分數最高
+        best = {}  # label_str -> (box, label_idx, score)
 
         for box in output.boxes:
             label_str = output.names[int(box.cls[0])]
@@ -51,11 +52,13 @@ class YoloDetectionModel(BaseDetectionModel):
                 continue
 
             score = round(float(box.conf[0]), 4)
-            if label_str not in seen:
-                seen.add(label_str)
-                x1, y1, x2, y2 = box.xyxy[0].tolist()
-                boxes.append((int(x1), int(y1), int(x2), int(y2)))
-                labels.append(label_idx)
-                scores.append(score)
+            if label_str not in best or score > best[label_str][2]:
+                best[label_str] = (box, label_idx, score)
+
+        for box, label_idx, score in best.values():
+            x1, y1, x2, y2 = box.xyxy[0].tolist()
+            boxes.append((int(x1), int(y1), int(x2), int(y2)))
+            labels.append(label_idx)
+            scores.append(score)
 
         return DetectionResult(boxes=boxes, labels=labels, scores=scores)

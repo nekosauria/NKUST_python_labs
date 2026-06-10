@@ -1,13 +1,10 @@
 import json
 import time
-from pathlib import Path
-from flask import current_app
 from flask import Blueprint, request, jsonify, app
 
 from apps.const.image_const import allowed_file, ImageConst
-from apps.model.impl.torch_detection_model import TorchDetectionModel
-from apps.model.impl.yolo_detection_model import YoloDetectionModel
 from apps.service.detection_service import DetectionService
+from apps.model.factory.detection_model_factory import DetectionModelFactory
 
 image_bp = Blueprint("image", __name__)
 @image_bp.route('/upload', methods=["GET", "POST"])
@@ -20,7 +17,7 @@ def upload():
 
     # get parameter
     file = request.files["image"]
-    model_type = request.form.get("model", "yolo")  # 預設 yolo
+    model_type = request.form.get("model", ImageConst.MODEL_YOLO)  # 預設 yolo
 
     if file.filename == "":
         return jsonify({"error": "empty filename"}), 400
@@ -28,26 +25,17 @@ def upload():
         return jsonify({"error": "file type not allowed"}), 400
 
     try:
-        print(f"current_app.root_path:{current_app.root_path}")
+        # === 直接從全域單例工廠取得常駐記憶體的模型 ===
+        try:
+            model = DetectionModelFactory.get_model(model_type)
+        except ValueError as ve:
+            return jsonify({"error": str(ve)}), 400
 
-        match model_type:
-            case "torch":
-                model = TorchDetectionModel(
-                    model_path=Path(current_app.root_path) / "model" / "maskrcnn_model.pt",
-                    score_threshold=ImageConst.SCORE_THRESHOLD
-                )
-            case "yolo":
-                model = YoloDetectionModel(
-                    model_path=Path(current_app.root_path) / "model" / "yolo11n.pt",
-                    score_threshold=ImageConst.SCORE_THRESHOLD
-                )
-            case _:
-                return jsonify({"error": f"unknown model type: {model_type}"}), 400
-
+        # === 開始跑預測 ===
         svc = DetectionService(model=model)
-
         tag_results, predict_list, ora_img, detect_img = svc.make_detect_image(file, model_type)
-        cost = round(time.time() - t0, 3) # e.g. yolo:0.35, torch:1.338
+
+        cost = round(time.time() - t0, 3)
         print(f"\n[{model.__class__.__name__}] make_detect_image cost: {cost}s")
 
     except Exception as e:

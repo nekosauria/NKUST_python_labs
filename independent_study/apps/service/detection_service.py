@@ -15,10 +15,6 @@ class DetectionService:
         self._model = model
         self._loaded = False
 
-    def _ensure_loaded(self) -> None:
-        if not self._loaded:
-            self._model.load(self._model.model_path)
-            self._loaded = True
 
     def make_detect_image(self, file, model_type) -> tuple[dict, dict, str, str]:
         """
@@ -57,7 +53,6 @@ class DetectionService:
 
         # -----------------------------------------------------------
         # 執行推論，取第一張圖片的結果（回傳格式：list of dict）
-        self._ensure_loaded()
         output = self._model.predict(image)  # ← 統一介面，與模型實作無關
         # -----------------------------------------------------------
 
