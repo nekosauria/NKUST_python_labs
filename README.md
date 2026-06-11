@@ -17,6 +17,6 @@
 
 ### 🤖 4. 簡單專題實作 (物件偵測)
 
-歡迎試用：https://nkust.nekosaur.com/
+歡迎試用：https://demo.nekosaur.com/
 
 ---
