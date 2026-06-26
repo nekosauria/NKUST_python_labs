@@ -11,8 +11,9 @@ from apps.model.interface.base_detection_model import BaseDetectionModel
 
 
 class TorchDetectionModel(BaseDetectionModel):
-    def __init__(self, model_path: Path, score_threshold: float = 0.5):
+    def __init__(self, model_path: Path, score_threshold: float = 0.5, device: str = "cpu"):
         self._model_path = model_path
+        self.device = device
         self._model = None
         self._score_threshold = score_threshold
         self._labels = ImageConst.TORCH_LABELS
@@ -29,18 +30,18 @@ class TorchDetectionModel(BaseDetectionModel):
     def labels(self) -> List[str]:
         return self._labels
 
-    def load(self, model_path: Path) -> None:
-        print(f"loading model from {model_path}")
-        raw = torch.load(model_path, weights_only=False)
+    def load(self) -> None:
+        print(f"loading model from {self.model_path}, device: {self.device}")
+        raw = torch.load(self.model_path, weights_only=False)
         print(type(raw))  # 看這裡
-        self._model = raw
+        self._model = raw.to(self.device)
         self._model.eval()
 
     def predict(self, image: Image) -> DetectionResult:
         if self._model is None:
             raise RuntimeError("模型尚未載入，請先呼叫 load()")
 
-        image_tensor = torchvision.transforms.functional.to_tensor(image)
+        image_tensor = torchvision.transforms.functional.to_tensor(image).to(self.device)
         """
         將 PIL Image 轉成 PyTorch 張量
         PyTorch Tensor (以此例來說)
@@ -96,7 +97,13 @@ class TorchDetectionModel(BaseDetectionModel):
         # 每個 label 若有重複取分數最高
         best = {}  # label_str -> (box, label_idx, score)
 
-        for box, label, score in zip(output["boxes"], output["labels"], output["scores"]):
+        # 將輸出的 tensors 整個拉回 CPU 記憶體並轉成 numpy/list，
+        # 這樣在後面的 Python 迴圈與型別轉換（int, float）速度最快且絕對不會跨裝置報錯。
+        out_boxes = output["boxes"].cpu().detach().numpy()
+        out_labels = output["labels"].cpu().detach().tolist()
+        out_scores = output["scores"].cpu().detach().tolist()
+
+        for box, label, score in zip(out_boxes, out_labels, out_scores):
             label_str = self._labels[int(label)]
             score_f = round(float(score), 4)
             if label_str not in best or score_f > best[label_str][2]:

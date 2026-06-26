@@ -10,7 +10,7 @@ from apps.dto.detection_result import DetectionResult
 class BaseDetectionModel(ABC):
 
     @abstractmethod
-    def load(self, model_path: Path) -> None:
+    def load(self) -> None:
         """載入模型權重"""
         ...
 

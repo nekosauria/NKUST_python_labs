@@ -18,6 +18,6 @@
 
 
 # 使用 curl 工具發送 HTTP 請求
-curl -i -v -X POST https://demo.nekosaur.com/upload \
+curl -i -v -X POST https://nkust.nekosaur.com/upload \
   -F "image=@/Users/teddylai/Downloads/tmp/picture/cat0.jpg" \
-  -F "model=yolo"
+  -F "model=torch"

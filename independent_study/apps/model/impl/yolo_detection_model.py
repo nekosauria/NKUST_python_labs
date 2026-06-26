@@ -12,8 +12,9 @@ from apps.model.interface.base_detection_model import BaseDetectionModel
 class YoloDetectionModel(BaseDetectionModel):
     """YOLO 系列模型（ultralytics）"""
 
-    def __init__(self, model_path: Path, score_threshold: float = 0.5):
+    def __init__(self, model_path: Path, score_threshold: float = 0.5, device: str = "cpu"):
         self._model_path = model_path
+        self.device = device
         self._model = None
         self._score_threshold = score_threshold
         self._labels = ImageConst.YOLO_LABELS
@@ -30,21 +31,22 @@ class YoloDetectionModel(BaseDetectionModel):
     def labels(self) -> List[str]:
         return self._labels
 
-    def load(self, model_path: Path) -> None:
-        print(f"loading model from {model_path}")
-        self._model = YOLO(str(model_path))
+    def load(self) -> None:
+        print(f"loading model from {self.model_path}, device: {self.device}")
+        self._model = YOLO(str(self.model_path)).to(self.device)
 
 
     def predict(self, image: Image) -> DetectionResult:
         if self._model is None:
             raise RuntimeError("模型尚未載入，請先呼叫 load()")
 
-        output = self._model(image, verbose=False)[0]
+        output = self._model(image, verbose=False, device=self.device)[0]
         boxes, labels, scores = [], [], []
         # 每個 label 若有重複取分數最高
         best = {}  # label_str -> (box, label_idx, score)
 
-        for box in output.boxes:
+        # 把 output.boxes 移到 cpu() 再進行迴圈讀取，防止跨裝置資料存取卡頓或報錯
+        for box in output.boxes.cpu():
             label_str = output.names[int(box.cls[0])]
             label_idx = self._labels.index(label_str) if label_str in self._labels else -1
 
