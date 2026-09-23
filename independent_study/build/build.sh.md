@@ -6,14 +6,15 @@ cat /etc/os-release
 python3 --version
 
 ## scp project
+# ...
 mkdir -p /opt/NKUST_python_labs/independent_study/logs
-# ......
-sudo chown -R teddylai:teddylai /opt/NKUST_python_labs/independent_study
+sudo chown -R teddy:teddy /opt/NKUST_python_labs/independent_study
 
 # add python venv & venv install package
 cd /opt/NKUST_python_labs/independent_study
 python3 -m venv .venv
 source .venv/bin/activate
+which python3
 pip install --upgrade pip
 pip install -r build/requirements.txt
 
@@ -27,7 +28,7 @@ After=network.target
 
 [Service]
 Type=simple
-User=teddylai
+User=teddy
 
 # 專案的根目錄路徑
 WorkingDirectory=/opt/NKUST_python_labs/independent_study
